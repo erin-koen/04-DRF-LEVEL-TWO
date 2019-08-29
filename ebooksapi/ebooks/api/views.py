@@ -1,18 +1,24 @@
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
+from rest_framework import permissions
+
 from ebooks.models import Ebook, Review
 from ebooks.api.serializers import EbookSerializer, ReviewSerializer
+from ebooks.api.permissions import IsAdminUserOrReadOnly
 
 
-# with Concrete view classes, you get all of the commented out view in three lines.
+# with Concrete view classes, you get all of the commented out view in 3lines.
 class EbookListCreateAPIView(generics.ListCreateAPIView):
     queryset = Ebook.objects.all()
     serializer_class = EbookSerializer
+    # object-level permissions
+    permission_classes = [IsAdminUserOrReadOnly]
 
 
 class EbookDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Ebook.objects.all()
     serializer_class = EbookSerializer
+    permission_classes = [IsAdminUserOrReadOnly]
 
 
 class ReviewCreateAPIView(generics.CreateAPIView):
