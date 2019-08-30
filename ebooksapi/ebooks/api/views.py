@@ -1,10 +1,12 @@
 from rest_framework import generics
-from rest_framework.generics import get_object_or_404
 from rest_framework import permissions
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import get_object_or_404
 
 from ebooks.models import Ebook, Review
 from ebooks.api.serializers import EbookSerializer, ReviewSerializer
-from ebooks.api.permissions import IsAdminUserOrReadOnly
+from ebooks.api.permissions import (IsAdminUserOrReadOnly,
+                                    IsReviewAuthorOrReadOnly)
 
 
 # with Concrete view classes, you get all of the commented out view in 3lines.
@@ -24,18 +26,27 @@ class EbookDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 class ReviewCreateAPIView(generics.CreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
     # to connect to an ebook instance, we need to overwrite perform_create()
 
     def perform_create(self, serializer):
         ebook_pk = self.kwargs.get("ebook_pk")
         ebook = get_object_or_404(Ebook, pk=ebook_pk)
+        review_author = self.request.user  # user comes through on the user?
+        review_queryset = Review.objects.filter(
+            ebook=ebook, review_author=review_author)
+        if review_queryset.exists:
+            raise ValidationError("You have already reviewed this book.")
+
         # link occurs below
-        serializer.save(ebook=ebook)
+        serializer.save(ebook=ebook, review_author=review_author)
 
 
 class ReviewDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    # permission_classes = [IsReviewAuthorOrReadOnly]
 
 # in order to provide behavior functionalities to our classes, we need
 # to pass in our mixins with the genericAPIView class

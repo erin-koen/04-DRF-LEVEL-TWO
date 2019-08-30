@@ -3,6 +3,9 @@ from ebooks.models import Ebook, Review
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    # binding the review_author that's passed to the serializer to the
+    # review record that will be created
+    review_author = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Review
