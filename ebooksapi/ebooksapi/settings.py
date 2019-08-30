@@ -122,8 +122,17 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # this is copied from docs:
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_PAGINATION_CLASS':
+#           'rest_framework.pagination.LimitOffsetPagination',
+#     'PAGE_SIZE': 3
+# }
+
 # # REST_FRAMEWORK = {
 #     'DEFAULT_PERMISSION_CLASSES': [
 #         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
 #     ]
 # }
+
+# above are commented out when implemented at view level

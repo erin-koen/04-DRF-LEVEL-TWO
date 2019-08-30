@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 
 from ebooks.models import Ebook, Review
+from ebooks.api.pagination import SmallSetPagination
 from ebooks.api.serializers import EbookSerializer, ReviewSerializer
 from ebooks.api.permissions import (IsAdminUserOrReadOnly,
                                     IsReviewAuthorOrReadOnly)
@@ -11,10 +12,12 @@ from ebooks.api.permissions import (IsAdminUserOrReadOnly,
 
 # with Concrete view classes, you get all of the commented out view in 3lines.
 class EbookListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Ebook.objects.all()
+    queryset = Ebook.objects.all().order_by("-id")
     serializer_class = EbookSerializer
     # object-level permissions
     permission_classes = [IsAdminUserOrReadOnly]
+    # object-level paginations - need to order the query set
+    pagination_class = SmallSetPagination
 
 
 class EbookDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
